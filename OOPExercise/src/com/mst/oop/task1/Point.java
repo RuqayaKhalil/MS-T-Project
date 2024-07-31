@@ -5,7 +5,6 @@ public class Point {
 
 	
 	public Point(int x, int y) {
-		super();
 		this.x = x;
 		this.y = y;
 	}
@@ -17,4 +16,10 @@ public class Point {
 	public int getY() {
 		return y;
 	}
+
+	@Override
+	public String toString() {
+		return "Point [x=" + x + ", y=" + y + "]";
+	}
+	
 }
