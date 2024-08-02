@@ -31,17 +31,18 @@ public class Speedy implements Runnable{
 			for(int i=1; i <=100 & !flag; i++) {
 				count = i;
 				System.out.println(Thread.currentThread().getName() + " : " + i);
-				Thread.sleep((int)(Math.random()*1000));
+				Thread.sleep((long)(Math.random()*1000));
 			}
 		} catch (InterruptedException e) {
-				e.printStackTrace();
+			e.printStackTrace();
 		}
 			
-		if(!flag) {
+		if (!flag) {
 			speedy.stop();
 			System.out.println(Thread.currentThread().getName() + " counted to 100 and stopped the another speedy");
+		} else {
+			System.out.println(Thread.currentThread().getName() + " counted to " + getCount()
+						+ " and is stopped by another speedy");
 		}
-		
 	}
-
 }
