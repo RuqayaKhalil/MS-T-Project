@@ -1,20 +1,20 @@
 package com.mst.oop.exam;
 
 public class Teacher extends Person {
-	private String profession;
+	private Profession profession;
 
-	public Teacher(String name, int age, String profession) {
+	public Teacher(String name, int age, Profession profession) {
 		super(name, age);
 		this.profession = profession;
 	}
 
-	public String getProfession() {
+	public Profession getProfession() {
 		return profession;
 	}
 
 	@Override
 	public String toString() {
-		return super.toString()+ " , Teacher [profession=" + profession + "]\n";
+		return super.toString()+ " , Teacher [profession=" + profession + "]";
 	}
 	
 	

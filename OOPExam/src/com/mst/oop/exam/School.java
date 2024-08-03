@@ -19,7 +19,7 @@ public class School {
 
 	@Override
 	public String toString() {
-		return "School\n [classroom=" + Arrays.toString(classroom) + "]\n";
+		return "School \n[classroom=" + Arrays.asList(classroom) + "]";
 	}
 	
 	

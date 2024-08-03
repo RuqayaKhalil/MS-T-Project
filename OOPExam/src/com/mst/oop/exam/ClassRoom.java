@@ -27,7 +27,7 @@ public class ClassRoom {
 
 	@Override
 	public String toString() {
-		return "ClassRoom [name=" + name + ", teacher=" + teacher + ", students=" + Arrays.toString(students) + "]";
+		return "\n\nClassRoom [name=" + name + ", teacher=" + teacher + "\n, students=\n" + Arrays.toString(students) + "]";
 	}
 	
 }

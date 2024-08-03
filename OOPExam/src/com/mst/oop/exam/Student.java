@@ -7,7 +7,7 @@ public class Student extends Person {
 
 	public Student(String name, int age, Grade[] grades) {
 		super(name, age);
-		this.grades = grades;
+		this.grades = grades; // ??new Grade[6]
 	}
 
 	public Grade[] getGrades() {
@@ -16,7 +16,7 @@ public class Student extends Person {
 
 	@Override
 	public String toString() {
-		return super.toString() +" , Student [grades=" + Arrays.toString(grades) + "]\n";
+		return super.toString() +" , Student [grades=\n" + Arrays.toString(grades) + "] \n";
 	}
 	
 	
