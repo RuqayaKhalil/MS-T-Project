@@ -34,8 +34,9 @@ public class Speedy implements Runnable{
 				Thread.sleep((long)(Math.random()*1000));
 			}
 		} catch (InterruptedException e) {
-				e.printStackTrace();
+			e.printStackTrace();
 		}
+<<<<<<< HEAD:ThreadsHW/src/com/mst/thread/Speedy.java
 		
 		//synchronized(this){
 			if (!flag) {
@@ -46,6 +47,15 @@ public class Speedy implements Runnable{
 						+ " and is stopped by another speedy");
 			}
 		//}
+=======
+			
+		if (!flag) {
+			speedy.stop();
+			System.out.println(Thread.currentThread().getName() + " counted to 100 and stopped the another speedy");
+		} else {
+			System.out.println(Thread.currentThread().getName() + " counted to " + getCount()
+						+ " and is stopped by another speedy");
+		}
+>>>>>>> main:Java/ThreadsHW/src/com/mst/thread/Speedy.java
 	}
-
 }

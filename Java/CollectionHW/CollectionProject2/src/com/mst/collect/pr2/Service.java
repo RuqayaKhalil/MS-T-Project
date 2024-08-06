@@ -7,7 +7,7 @@ public class Service {
 	}
 	
 	public static int getRandomNumber (int min, int max) {
-		return (int)(min + Math.random()*max);
+		return (int)(min + Math.random()*(max-min+1));
 	} 
 	
 	public static boolean isEven (int num) {
