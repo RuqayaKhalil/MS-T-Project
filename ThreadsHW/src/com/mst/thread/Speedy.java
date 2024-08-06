@@ -1,7 +1,7 @@
 package com.mst.thread;
 
 public class Speedy implements Runnable{
-	private volatile boolean flag = false;
+	private boolean flag = false;
 	private Speedy speedy; 
 	private int count = 0;
 		
@@ -31,17 +31,21 @@ public class Speedy implements Runnable{
 			for(int i=1; i <=100 & !flag; i++) {
 				count = i;
 				System.out.println(Thread.currentThread().getName() + " : " + i);
-				Thread.sleep((int)(Math.random()*1000));
+				Thread.sleep((long)(Math.random()*1000));
 			}
 		} catch (InterruptedException e) {
 				e.printStackTrace();
 		}
-			
-		if(!flag) {
-			speedy.stop();
-			System.out.println(Thread.currentThread().getName() + " counted to 100 and stopped the another speedy");
-		}
 		
+		//synchronized(this){
+			if (!flag) {
+				speedy.stop();
+				System.out.println(Thread.currentThread().getName() + " counted to 100 and stopped the another speedy");
+			} else {
+				System.out.println(Thread.currentThread().getName() + " counted to " + getCount()
+						+ " and is stopped by another speedy");
+			}
+		//}
 	}
 
 }
