@@ -12,17 +12,12 @@ public class LoaderService {
 	@Autowired
 	LoaderRepository loaderRepository;
 
-	public void loadFiles(List<EntryInfo> jiraList, List<EntryInfo> gitHubList, List<EntryInfo> clickUpList) {
+	public void loadFiles(List<EntryInfo> scannedList) {
 		
-		for(int i=0; i<jiraList.size(); i++) {
-			loaderRepository.save(jiraList.get(i));
+		for(int i=0; i<scannedList.size(); i++) {
+			loaderRepository.save(scannedList.get(i));
 		}
-		for(int i=0; i<gitHubList.size(); i++) {
-			loaderRepository.save(gitHubList.get(i));
-		}
-		for(int i=0; i<clickUpList.size(); i++) {
-			loaderRepository.save(clickUpList.get(i));
-		}
+		
 	}
 	
 }
