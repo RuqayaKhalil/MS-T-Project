@@ -6,5 +6,4 @@ import com.mst.beans.EntryInfo;
 
 @Repository
 public interface LoaderRepository extends JpaRepository<EntryInfo,Long>{
-	
 }

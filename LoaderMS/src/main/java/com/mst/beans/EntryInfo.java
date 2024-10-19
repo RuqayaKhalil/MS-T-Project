@@ -1,5 +1,4 @@
 package com.mst.beans;
-
 import java.time.LocalDateTime;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -14,11 +13,9 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 public class EntryInfo {
-	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long task_id; 
-	
 	private LocalDateTime timestamp = LocalDateTime.now();
 	private String owner_id;//long
 	private String project;
@@ -30,5 +27,4 @@ public class EntryInfo {
 	private String user_story;
 	private String task_point;//long
 	private String sprint;
-
 }
