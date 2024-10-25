@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 import com.mst.beans.GitHubFile;
 
-@FeignClient(name = "githubClient", url = "https://api.github.com/repos")
+@FeignClient(name = "githubClient", url = "${gitHubApi.service.url}")
 public interface GitHubFolderClient {
 	// Fetch the contents of a folder in a GitHub repo
 	@GetMapping("/{owner}/{repo}/contents/{folderPath}")

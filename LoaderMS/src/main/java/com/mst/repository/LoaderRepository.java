@@ -12,19 +12,18 @@ import com.mst.beans.EntryInfo;
 @Repository
 public interface LoaderRepository extends JpaRepository<EntryInfo, Long> {
 
-	@Query("SELECT COUNT(e) >= :threshold FROM EntryInfo e " + "WHERE e.label = :label AND e.timestamp >= timeLimit)")
-	public Boolean existsByLabelAndTimestampGreaterThanEqual(@Param("label") String label,
-			@Param("threshold") int threshold, @Param("timeLimit") LocalDateTime timeLimit);
+	@Query("SELECT COUNT(e) FROM EntryInfo e " + "WHERE e.label = :label AND e.timestamp >= :timeLimit")
+	public Long existsByLabelAndTimestampGreaterThanEqual(@Param("label") String label,@Param("timeLimit") LocalDateTime timeLimit);
 
-	@Query("SELECT e.developer_id FROM EntryInfo e " + "WHERE e.label = :label AND e.task_point <= :since "
+	@Query("SELECT e.developer_id FROM EntryInfo e " + "WHERE e.label = :label AND e.timestamp >= :timeLimit "
 			+ "GROUP BY e.developer_id " + "ORDER BY COUNT(e) DESC")
-	public List<String> developerMostOccurrence(@Param("label") String label, @Param("since") String since);
+	public List<String> developerMostOccurrence(@Param("label") String label, @Param("timeLimit") LocalDateTime timeLimit);
 
 	@Query("SELECT e.label, COUNT(e.task_number) FROM EntryInfo e "
-			+ "WHERE e.developer_id = :developer_id AND e.task_point <= :since " + "GROUP BY e.label")
-	public List<Object[]> aggregationOfLabel(@Param("developer_id") String developer_id, @Param("since") String since);
+			+ "WHERE e.developer_id = :developer_id AND e.timestamp >= :timeLimit " + "GROUP BY e.label")
+	public List<Object[]> aggregationOfLabel(@Param("developer_id") String developer_id, @Param("timeLimit") LocalDateTime timeLimit);
 
 	@Query("SELECT COUNT(e.task_number) FROM EntryInfo e "
-			+ "WHERE e.developer_id = :developer_id AND e.task_point <= :since")
-	public Long totalTasks(@Param("developer_id") String developer_id, @Param("since") String since);
+			+ "WHERE e.developer_id = :developer_id AND e.timestamp >= :timeLimit")
+	public Long totalTasks(@Param("developer_id") String developer_id, @Param("timeLimit") LocalDateTime timeLimit);
 }

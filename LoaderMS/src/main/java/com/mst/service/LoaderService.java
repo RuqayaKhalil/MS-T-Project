@@ -178,22 +178,28 @@ public class LoaderService {
 	public HashMap<Integer, Boolean> checkIfMetricsMeetTheCondition(List<Metric> metricsToCheck) {
 		HashMap<Integer, Boolean> response = new HashMap<>();
 		Metric metric = new Metric();
+		Boolean exists = false;
 		LocalDateTime time = LocalDateTime.now();
 		for (int i = 0; i < metricsToCheck.size(); i++) {
 			metric = metricsToCheck.get(i);
-			response.put(metric.getId(), loaderRepository.existsByLabelAndTimestampGreaterThanEqual(metric.getLabel(),
-					metric.getThreshold(), time.minusHours(metric.getTimeFrameHours())));
+			exists = loaderRepository.existsByLabelAndTimestampGreaterThanEqual(metric.getLabel(), 
+					time.minusHours(metric.getTimeFrameHours())) >= metric.getThreshold();
+			response.put(metric.getId(), exists);
 		} // TODO: check if label found and throw exception if not?
 		return response;
 	}
 
 	public String developerMostOccurrence(String label, String since) {
-		List<String> developers = loaderRepository.developerMostOccurrence(label, since);
+		LocalDateTime time = LocalDateTime.now();
+		Long days = Long.parseLong(since);
+		List<String> developers = loaderRepository.developerMostOccurrence(label, time.minusDays(days));
 		return developers.isEmpty() ? null : developers.get(0); // Return the developer with the most occurrences
 	}
 
 	public Map<String, Integer> aggregationOfLabel(String developer_id, String since) {
-		List<Object[]> results = loaderRepository.aggregationOfLabel(developer_id, since);
+		LocalDateTime time = LocalDateTime.now();
+		Long days = Long.parseLong(since);
+		List<Object[]> results = loaderRepository.aggregationOfLabel(developer_id, time.minusDays(days));
 		Map<String, Integer> labelCountMap = new HashMap<>();
 
 		for (Object[] result : results) {
@@ -206,7 +212,9 @@ public class LoaderService {
 	}
 
 	public Long totalTasks(String developer_id, String since) {
-		return loaderRepository.totalTasks(developer_id, since);
+		LocalDateTime time = LocalDateTime.now();
+		Long days = Long.parseLong(since);
+		return loaderRepository.totalTasks(developer_id, time.minusDays(days));
 	}
 
 	/**************************************************************************************/
