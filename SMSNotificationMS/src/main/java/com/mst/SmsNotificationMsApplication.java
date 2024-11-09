@@ -6,10 +6,10 @@ import org.springframework.cloud.openfeign.EnableFeignClients;
 
 @SpringBootApplication
 @EnableFeignClients
-public class MailNotificationMsApplication {
+public class SmsNotificationMsApplication {
 
 	public static void main(String[] args) {
-		SpringApplication.run(MailNotificationMsApplication.class, args);
+		SpringApplication.run(SmsNotificationMsApplication.class, args);
 	}
 
 }

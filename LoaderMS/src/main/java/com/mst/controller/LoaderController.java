@@ -9,6 +9,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,17 +21,27 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.mst.api.LoaderControllerIFC;
 import com.mst.beans.GitHubFile;
 import com.mst.beans.Metric;
 import com.mst.service.LoaderService;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
+
+@Tag(name = "Loader service", description = "Loader APIs")
 @RestController
 @RequestMapping("/loader")
-public class LoaderController {
+public class LoaderController implements LoaderControllerIFC {
 
-	private static final String OWNER = "yones753";
-	private static final String REPO = "project_data_files";
-	private static final String LOCAL_FOLDER_PATH = "gitHubRepoFolder";
+	@Value("${owner.name}")
+	private String owner;
+
+	@Value("${repo.name}")
+	private String repo;
+
+	@Value("${local.folder.path}")
+	private String localFolderPath;
+
 	private int flag = 0; // check if there are new files to scan and save to db
 
 	@Autowired
@@ -41,14 +53,41 @@ public class LoaderController {
 	@Autowired
 	private GitHubFileClient gitHubFileClient;
 
-	// Method to load files from multiple folders
-	@GetMapping("/loadNewFilesFromFolders")
-	public ResponseEntity<List<GitHubFile>> loadFilesFromMultipleFolders(@RequestParam String owner,
-			@RequestParam String repo, @RequestParam List<String> folderPaths) {
+	// Scheduler to run hourly and scan for new files
+	@Scheduled(fixedRate = 3600000) // 1 hours in milliseconds
+	public ResponseEntity<String> autoScanFiles() throws IOException {
+		return loadReadFiles();
+	}
+
+	@PostMapping("/load-Files-manual")
+	public ResponseEntity<String> loadReadFiles() {
+		try {
+			loadNewFiles(owner, repo, localFolderPath);
+			loaderService.scanNewFiles();
+			if (flag == 0) {
+				return ResponseEntity.ok("No new Files to load");
+			}
+			flag = 0;
+			return ResponseEntity.ok("Files successfully loaded and data saved in the database");
+		} catch (IOException e) {
+			e.printStackTrace();
+			return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+					.body("An error occurred while loading files: " + e.getMessage());
+		}
+	}
+
+	/***********************************************************************************************************/
+	/* HELPER FUNCTIONS */
+
+	private ResponseEntity<List<GitHubFile>> loadFilesFromMultipleFolders(String owner, String repo,
+			List<String> folderPaths) {
 
 		List<GitHubFile> allFiles = new ArrayList<>();
 		for (String folderPath : folderPaths) {
 			ResponseEntity<List<GitHubFile>> response = gitHubFolderClient.getFilesFromFolder(owner, repo, folderPath);
+			if (response == null) {
+				throw new RuntimeException("Response from GitHub client is null for folder: " + folderPath);
+			}
 			if (response.getStatusCode().is2xxSuccessful()) {
 				allFiles.addAll(response.getBody());
 			} else {
@@ -58,9 +97,7 @@ public class LoaderController {
 		return ResponseEntity.ok(allFiles);
 	}
 
-	@GetMapping("/loadNewFiles")
-	public ResponseEntity<String> loadNewFiles(@RequestParam String owner, @RequestParam String repo,
-			@RequestParam String parentFolderPath) throws IOException {
+	private ResponseEntity<String> loadNewFiles(String owner, String repo, String parentFolderPath) throws IOException {
 
 		// Load previously downloaded files from a tracking file
 		Set<String> previouslyDownloadedFiles = loaderService.loadProcessedFiles();
@@ -87,7 +124,6 @@ public class LoaderController {
 
 					// Track the new files
 					newFiles.add(file);
-					// updateTrackingFile(file.getPath());
 					flag = 1;
 				} else {
 					System.out.println("FILE ALREADY SCANNED: " + file.getPath());
@@ -128,33 +164,7 @@ public class LoaderController {
 		}
 	}
 
-	// Scheduler to run hourly and scan for new files
-//  //@Scheduled(fixedRate = 3600000) // 1 hours in milliseconds
-//  // @Scheduled(cron = "0 0 * * * ?")  // Runs every hour at the top of the hour //TODO which one to use?
-
-	// Scheduler to run hourly and scan for new files
-	@Scheduled(fixedRate = 3600000) // 1 hours in milliseconds
-	public void autoScanFiles() throws IOException {
-		loadReadFiles();
-		flag = 0;// TODO: must do this? or every run the run starts from the init of controller?
-	}
-
-	@PostMapping("/load-Files-manual")
-	public ResponseEntity<String> loadReadFiles() {
-		try {
-//			loaderService.GitRepoClone();
-			loadNewFiles(OWNER, REPO, LOCAL_FOLDER_PATH);
-			loaderService.scanNewFiles();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-
-		if (flag == 0) {
-			return ResponseEntity.ok("No new Files to load");
-		}
-		flag = 0;
-		return ResponseEntity.ok("Files successfully loaded and data saved in the database");
-	}
+	/***********************************************************************************************************/
 
 	/**************************************************************************************/
 	/* INTEGRATION FUNCTIONS */
@@ -171,7 +181,8 @@ public class LoaderController {
 		if (developerID != null) {
 			return ResponseEntity.ok("Developer with most occurrences: " + developerID);
 		} else {
-			return ResponseEntity.notFound().build(); // No developers found
+//			return ResponseEntity.notFound().build(); // No developers found
+			return new ResponseEntity<>("no developers found: " + HttpStatus.BAD_REQUEST, HttpStatus.BAD_REQUEST);
 		}
 	}
 
@@ -182,7 +193,11 @@ public class LoaderController {
 		if (!labelAggregationList.isEmpty()) {
 			return ResponseEntity.ok(labelAggregationList);
 		} else {
-			return ResponseEntity.notFound().build(); // No data found for the developer
+			 Map<String, Integer> errorResponse = new HashMap<>();
+		        errorResponse.put("error_code", 400);
+//		        errorResponse.put("error_message", "No developer found for the given ID");
+//			return new ResponseEntity<>(errorResponse,HttpStatus.BAD_REQUEST);
+		        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
 		}
 	}
 
@@ -192,7 +207,7 @@ public class LoaderController {
 		if (totalTasks != null && totalTasks > 0) {
 			return ResponseEntity.ok(totalTasks);
 		} else {
-			return ResponseEntity.ok(0L); // No tasks found, return 0
+			return new ResponseEntity<>(0L,HttpStatus.BAD_REQUEST);
 		}
 	}
 	/**************************************************************************************/

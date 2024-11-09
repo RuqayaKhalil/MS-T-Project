@@ -10,6 +10,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import com.mst.beans.EntryInfo;
@@ -24,14 +25,18 @@ public class LoaderService {
 	@Autowired
 	LoaderRepository loaderRepository;
 
-	private static final String PROCESSED_FILES_LOG = "processed_files.log";
+	@Value("${processed.files.log}")
+	private String processed_files;
+	
+	@Value("${local.folder.path}")
+	private String localFolderPath;
 
 	public List<File> scanNewFiles() throws IOException {
 		List<File> scannedFiles = new ArrayList<>();
 		Set<String> processedFiles = loadProcessedFiles();
 
 		// Load the parent folder from "project_data_files" at the root of the project
-		File parentFolder = new File("gitHubRepoFolder"); // Relative path to folder
+		File parentFolder = new File(localFolderPath); // Relative path to folder
 
 		// Get the subFolders (jira, gitHub, clickUp)
 		File[] subfolders = parentFolder.listFiles(File::isDirectory);
@@ -69,7 +74,7 @@ public class LoaderService {
 
 	public Set<String> loadProcessedFiles() throws IOException {
 		Set<String> processedFiles = new HashSet<>();
-		File logFile = new File(PROCESSED_FILES_LOG);
+		File logFile = new File(processed_files);
 
 		if (logFile.exists()) {
 			System.out.println("files exist");
@@ -86,7 +91,7 @@ public class LoaderService {
 	}
 
 	private void saveProcessedFiles(Set<String> processedFiles) throws IOException {
-		try (BufferedWriter writer = new BufferedWriter(new FileWriter(PROCESSED_FILES_LOG))) {
+		try (BufferedWriter writer = new BufferedWriter(new FileWriter(processed_files))) {
 			for (String fileName : processedFiles) {
 				writer.write(fileName);
 				writer.newLine();

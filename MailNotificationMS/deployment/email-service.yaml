@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: email-ns-app
+  name: email-ns-service
+spec:
+  ports:
+  - port: 7070
+    protocol: TCP
+    targetPort: 7070
+  selector:
+    app: email-ns-app
+  type: NodePort
+status:
+  loadBalancer: {}

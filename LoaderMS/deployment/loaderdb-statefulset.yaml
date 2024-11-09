@@ -1,0 +1,39 @@
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: loader-db
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: loader-db
+  template:
+    metadata:
+      labels:
+        app: loader-db
+    spec:
+      hostname: loader-db
+      containers:
+      - name: loader-db
+        image: mysql:latest
+        ports:
+        - containerPort: 3308
+        env:
+        - name: MYSQL_ALLOW_EMPTY_PASSWORD
+          value: "true"
+        - name: MYSQL_DATABASE
+          valueFrom:
+            configMapKeyRef:
+              name: mysql-config
+              key: MYSQL_DATABASE
+        volumeMounts:
+        - name: mysql-persistent-storage
+          mountPath: /var/lib/mysql
+  volumeClaimTemplates:
+  - metadata:
+      name: mysql-persistent-storage
+    spec:
+      accessModes: [ "ReadWriteOnce" ]
+      resources:
+        requests:
+          storage: 1Gi

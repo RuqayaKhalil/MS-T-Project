@@ -1,0 +1,10 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: mysql-config
+data:
+  MYSQL_HOST: "loaderDB" 
+  MYSQL_PORT: "3306"
+  MYSQL_USER: "root"
+  MYSQL_DATABASE: "loaderDB"
+  MYSQL_ALLOW_EMPTY_PASSWORD: "true""

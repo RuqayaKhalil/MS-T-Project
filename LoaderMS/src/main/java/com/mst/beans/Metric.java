@@ -8,7 +8,8 @@ public class Metric {
 
 	private String name;
     
-	private String label; //TODO:change to enum
+	private String label; 
+//	private LabelType label; //TODO:change to enum
 	
 	private int threshold;
 

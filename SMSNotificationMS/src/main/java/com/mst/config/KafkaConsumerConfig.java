@@ -25,7 +25,6 @@ public class KafkaConsumerConfig {
 	@Value("${spring.kafka.consumer.group-id}")
 	private String groupId;
 	
-	
 	@Value("${spring.kafka.consumer.properties.spring.json.trusted.packages}")
 	private String trustedPackages;
 	
@@ -37,8 +36,8 @@ public class KafkaConsumerConfig {
 		Map<String, Object> config = new HashMap<>();
 		config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 		config.put(ConsumerConfig.GROUP_ID_CONFIG, groupId);
-		
-		// Set up ErrorHandlingDeserializer with JSON deserializer
+
+		// Set up ErrorHandlingDeserializer with JSON Deserializer
 		config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
 		config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, ErrorHandlingDeserializer.class);
 
